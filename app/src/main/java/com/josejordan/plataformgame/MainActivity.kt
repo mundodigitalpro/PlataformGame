@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var man: ImageView
     private lateinit var character: ImageView
     private val moveSpeed = 10
     private var isTouchingLeft = false
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        man = findViewById(R.id.man)
         character = findViewById(R.id.character)
         val gameLayout = findViewById<RelativeLayout>(R.id.gameLayout)
         gameLayout.setOnTouchListener { _, event ->
@@ -40,6 +41,13 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
+    private fun checkCollision(): Boolean {
+        return character.x < man.x + man.width &&
+                character.x + character.width > man.x &&
+                character.y < man.y + man.height &&
+                character.y + character.height > man.y
+    }
+
 
     private fun startUpdatingCharacter() {
         touchJob = CoroutineScope(Dispatchers.Main).launch {
@@ -55,6 +63,11 @@ class MainActivity : AppCompatActivity() {
             moveCharacter(-moveSpeed)
         } else if (isTouchingRight) {
             moveCharacter(moveSpeed)
+        }
+        if (checkCollision()) {
+            // ¡Colisión detectada!
+            // Puedes detener el juego, mostrar un mensaje, etc. según lo necesites.
+            touchJob?.cancel()
         }
     }
 
